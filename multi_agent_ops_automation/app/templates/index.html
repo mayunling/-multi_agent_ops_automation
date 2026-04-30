@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多Agent运维自动化系统</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div>
+        <h1>多Agent系统运营自动化系统</h1>
+        <p>MonitorAgent → AnalysisAgent → ResolverAgent → ReportAgent</p>
+      </div>
+      <div class="actions">
+        <button onclick="startScheduler()">启动模拟监控</button>
+        <button onclick="stopScheduler()">停止模拟监控</button>
+        <button onclick="location.reload()">刷新</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>手动提交指标</h2>
+      <form id="metricForm">
+        <input name="service_name" value="campus-api" placeholder="服务名" />
+        <input name="cpu" type="number" value="91" placeholder="CPU" />
+        <input name="memory" type="number" value="70" placeholder="内存" />
+        <input name="disk" type="number" value="60" placeholder="磁盘" />
+        <input name="error_rate" type="number" value="1" placeholder="错误率" />
+        <input name="latency_ms" type="number" value="300" placeholder="延迟ms" />
+        <button type="submit">运行多Agent流程</button>
+      </form>
+      <pre id="result"></pre>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>事件列表</h2>
+        <table>
+          <thead><tr><th>ID</th><th>服务</th><th>级别</th><th>状态</th><th>标题</th><th>操作</th></tr></thead>
+          <tbody>
+            {% for i in incidents %}
+            <tr>
+              <td>{{ i.id }}</td><td>{{ i.service_name }}</td><td><span class="badge">{{ i.level }}</span></td><td>{{ i.status }}</td><td>{{ i.title }}</td>
+              <td><a href="/api/incidents/{{ i.id }}/report" target="_blank">报告</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>最近指标</h2>
+        <table>
+          <thead><tr><th>服务</th><th>CPU</th><th>内存</th><th>磁盘</th><th>错误率</th><th>延迟</th></tr></thead>
+          <tbody>
+            {% for m in metrics %}
+            <tr><td>{{ m.service_name }}</td><td>{{ m.cpu }}</td><td>{{ m.memory }}</td><td>{{ m.disk }}</td><td>{{ m.error_rate }}</td><td>{{ m.latency_ms }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Agent执行日志</h2>
+      <table>
+        <thead><tr><th>时间</th><th>事件ID</th><th>Agent</th><th>摘要</th></tr></thead>
+        <tbody>
+          {% for l in logs %}
+          <tr><td>{{ l.created_at }}</td><td>{{ l.incident_id }}</td><td>{{ l.agent }}</td><td>{{ l.summary }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
